@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Made In Verse - Subir Archivos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #drop-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #file-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+        }
+
+        #file-list li {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        #file-list li img {
+            margin-right: 10px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer; /* Añadido para mostrar que es clickeable */
+        }
+
+        hr {
+            width: 180%; /* Cambiado a 90% para hacer la línea más larga */
+            margin: 10px 0;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="drop-area">
+        <h1>Arrastra y suelta archivos PDF</h1>
+        <p>O selecciona archivos haciendo clic aquí.</p>
+        <input type="file" id="fileInput" multiple accept=".pdf" style="display: none;">
+    </div>
+
+    <ul id="file-list"></ul>
+
+    <script>
+        document.getElementById('drop-area').addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('active');
+        });
+
+        document.getElementById('drop-area').addEventListener('dragleave', function() {
+            this.classList.remove('active');
+        });
+
+        document.getElementById('drop-area').addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('active');
+            handleDrop(e.dataTransfer.files);
+        });
+
+        document.getElementById('drop-area').addEventListener('click', function() {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', function() {
+            handleDrop(this.files);
+        });
+
+        function handleDrop(files) {
+            var fileList = document.getElementById('file-list');
+
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                if (file.type === 'application/pdf') {
+                    var listItem = document.createElement('li');
+
+                    // Agrega un evento para abrir el PDF en una nueva ventana al hacer clic en el icono y el nombre del archivo
+                    var openPdf = function () {
+                        window.open(URL.createObjectURL(file), '_blank');
+                    };
+
+                    // Icono
+                    var icon = document.createElement('img');
+                    icon.src = 'pdf-icon.png'; // Coloca la ruta correcta a tu icono de PDF
+                    icon.alt = 'PDF Icon';
+                    icon.addEventListener('click', openPdf);
+                    listItem.appendChild(icon);
+
+                    // Nombre del archivo
+                    var fileName = document.createElement('span');
+                    fileName.textContent = file.name;
+                    fileName.addEventListener('click', openPdf);
+                    listItem.appendChild(fileName);
+
+                    fileList.appendChild(listItem);
+
+                    // Línea de separación
+                    var separator = document.createElement('hr');
+                    fileList.appendChild(separator);
+                } else {
+                    alert('Por favor, seleccione solo archivos PDF.');
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
+
+
+
