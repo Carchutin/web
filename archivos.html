@@ -89,7 +89,7 @@
                 const listItem = document.createElement('li');
 
                 const openPdf = function () {
-                    window.open(file.download_url, '_blank');
+                    window.open(file.html_url, '_blank');
                 };
 
                 const icon = document.createElement('img');
@@ -112,7 +112,7 @@
 
         async function uploadToGitHub(file) {
             const username = 'Carchutin';
-            const repository = 'Tweb';
+            const repository = 'web';
             const token = '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';
             const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${file.name}`;
 
