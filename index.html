@@ -77,11 +77,14 @@
 
     <script>
         async function fetchUserData() {
-            const apiUrl = 'https://api.github.com/repos/Carchutin/web/contents/usuarios.txt';
+            const apiUrl = 'https://raw.githubusercontent.com/Carchutin/web/main/usuarios.txt';
             const response = await fetch(apiUrl);
-            const data = await response.json();
 
-            const decodedContent = atob(data.content);
+            if (!response.ok) {
+                throw new Error('No se pudo obtener el archivo usuarios.txt');
+            }
+
+            const decodedContent = await response.text();
             const userData = decodedContent.split('\n')
                 .map(line => line.split(':').map(item => item.trim()));
 
@@ -95,14 +98,19 @@
             const enteredUsername = document.getElementById('username').value;
             const enteredPassword = document.getElementById('password').value;
 
-            const userData = await fetchUserData();
+            try {
+                const userData = await fetchUserData();
 
-            if (userData['Nombre de usuario'] === enteredUsername && userData['Contraseña'] === enteredPassword) {
-                alert('Inicio de sesión exitoso');
-                // Redirigir a la página de inicio o realizar otras acciones.
-            } else {
-                alert('Nombre de usuario o contraseña incorrectos');
-                // Puedes redirigir a otra página o realizar otras acciones en caso de error.
+                if (userData['Nombre de usuario'] === enteredUsername && userData['Contraseña'] === enteredPassword) {
+                    alert('Inicio de sesión exitoso');
+                    // Redirigir a la página de inicio o realizar otras acciones.
+                } else {
+                    alert('Nombre de usuario o contraseña incorrectos');
+                    // Puedes redirigir a otra página o realizar otras acciones en caso de error.
+                }
+            } catch (error) {
+                console.error(error.message);
+                alert('Error al obtener los datos del usuario');
             }
 
             // Devolvemos false para evitar que el formulario se envíe realmente.
@@ -112,4 +120,3 @@
 
 </body>
 </html>
-
