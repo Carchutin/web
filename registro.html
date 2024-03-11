@@ -47,98 +47,76 @@
 </head>
 <body>
 
-    <div class="register-container">
-        <h1>Registro en Made In Verse</h1>
-        <form id="registrationForm">
-            <label for="newUsername">Nuevo Nombre de Usuario:</label>
-            <input type="text" id="newUsername" name="newUsername" required>
+<div class="register-container">
+    <h1>Registro en Made In Verse</h1>
+    <form id="registrationForm">
+        <label for="newUsername">Nuevo Nombre de Usuario:</label>
+        <input type="text" id="newUsername" name="newUsername" required>
 
-            <label for="newPassword">Nueva Contraseña:</label>
-            <input type="password" id="newPassword" name="newPassword" required>
+        <label for="newPassword">Nueva Contraseña:</label>
+        <input type="password" id="newPassword" name="newPassword" required>
 
-            <button type="button" onclick="registerUser()">Registrarse</button>
-        </form>
-    </div>
+        <button type="button" onclick="registerUser()">Registrarse</button>
+    </form>
+</div>
 
-    <script>
-        async function checkFileExistence(username, token) {
-            const apiUrl = `https://api.github.com/repos/Carchutin/web/contents/usuarios/${username}/datos.txt`;
-            const response = await fetch(apiUrl, {
-                headers: {
-                    'Authorization': `token ${token}`,
-                },
-            });
+<script>
+    async function checkUserExistence(username, token) {
+        const apiUrl = 'https://api.github.com/repos/Carchutin/web/contents/usuarios.txt';
+        const response = await fetch(apiUrl, {
+            headers: {
+                'Authorization': `token ${token}`,
+            },
+        });
 
-            return response.ok;
+        if (!response.ok) {
+            return false; // No se pudo acceder al archivo de usuarios
         }
 
-        async function createGitHubFolder(username, token) {
-            const apiUrl = `https://api.github.com/repos/Carchutin/web/contents/usuarios/${username}`;
-            const response = await fetch(apiUrl, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message: `Crear carpeta para ${username}`,
-                    content: '',
-                }),
-            });
+        const data = await response.json();
+        const content = atob(data.content); // Decodificar contenido base64
+        return content.includes(`Nombre de usuario: ${username}`);
+    }
 
-            return response.ok;
+    async function registerUser() {
+        const newUsername = document.getElementById('newUsername').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const rawToken = 'ghp_wOFybg4kUGsJMJwNdFebnNDluU9UZl0P5dZ?U';
+        const cleanedToken = rawToken.replace(/\?/g, '');
+
+        const userExists = await checkUserExistence(newUsername, cleanedToken);
+
+        if (userExists) {
+            alert('Ya existe un usuario con ese nombre. Por favor, elija otro.');
+            return;
         }
 
-        async function createGitHubFile(username, password, token) {
-            const apiUrl = `https://api.github.com/repos/Carchutin/web/contents/usuarios/${username}/datos.txt`;
-            const fileContent = `Nombre de usuario: ${username}\nContraseña: ${password}`;
+        const apiUrl = 'https://api.github.com/repos/Carchutin/web/contents/usuarios.txt';
+        const fileContent = `Nombre de usuario: ${newUsername}\nContraseña: ${newPassword}\n\n`;
 
-            const response = await fetch(apiUrl, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message: `Crear archivo de datos para ${username}`,
-                    content: btoa(unescape(encodeURIComponent(fileContent))),
-                }),
-            });
+        const response = await fetch(apiUrl, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${cleanedToken}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: `Agregar usuario ${newUsername}`,
+                content: btoa(unescape(encodeURIComponent(fileContent))),
+            }),
+        });
 
-            return response.ok;
+        if (response.ok) {
+            alert('Usuario registrado exitosamente.');
+            // Redirigir a la página de inicio de sesión o a otra página.
+            window.location.href = 'index.html'; // Cambiar según tus necesidades.
+        } else {
+            alert('Error al registrar el usuario.');
         }
-
-        async function registerUser() {
-            const newUsername = document.getElementById('newUsername').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const rawToken = 'ghp_wOFybg4kUGsJMJwNdFebnNDluU9UZl0P5dZ?U';
-            const cleanedToken = rawToken.replace('?', '');
-
-            const fileExists = await checkFileExistence(newUsername, cleanedToken);
-
-            if (fileExists) {
-                alert('Ya existe un usuario con esos datos. Por favor, elija otros.');
-                return;
-            }
-
-            const folderCreated = await createGitHubFolder(newUsername, cleanedToken);
-
-            if (folderCreated) {
-                const fileCreated = await createGitHubFile(newUsername, newPassword, cleanedToken);
-
-                if (fileCreated) {
-                    alert('Usuario registrado exitosamente.');
-                    // Redirigir a la página de inicio de sesión o a otra página.
-                    window.location.href = 'index.html'; // Cambiar según tus necesidades.
-                } else {
-                    alert('Error al crear el archivo en GitHub.');
-                }
-            } else {
-                alert('Error al crear la carpeta en GitHub.');
-            }
-        }
-    </script>
+    }
+</script>
 
 </body>
 </html>
+
 
