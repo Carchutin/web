@@ -112,8 +112,8 @@
 
         async function uploadToGitHub(file) {
             const username = 'Carchutin';
-            const repository = 'web';
-            const token = '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';
+            const repository = 'Tweb';
+            const token = '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';
             const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${file.name}`;
 
             const response = await fetch(apiUrl, {
@@ -131,7 +131,7 @@
                     },
                 }),
             });
-            
+
             const data = await response.json();
             if (response.ok) {
                 alert('Archivo PDF subido exitosamente a GitHub.');
@@ -204,3 +204,4 @@
 
 </body>
 </html>
+
