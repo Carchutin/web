@@ -60,7 +60,7 @@
 
     <div class="login-container">
         <h1>Made In Verse</h1>
-        <form onsubmit="return loginUser()">
+        <form onsubmit="return isValidUser()">
             <label for="username">Nombre de Usuario:</label>
             <input type="text" id="username" name="username" required>
 
@@ -76,48 +76,41 @@
     </div>
 
     <script>
-        async function loginUser() {
-            const usernameInput = document.getElementById('username').value;
-            const passwordInput = document.getElementById('password').value;
+        function isValidUser() {
+            const enteredUsername = document.getElementById('username').value;
+            const enteredPassword = document.getElementById('password').value;
 
-            // Realiza la comprobación aquí (puedes modificarla según tus necesidades)
-            const isValid = await checkCredentials(usernameInput, passwordInput);
+            // Realiza la lógica de validación con tus datos almacenados
+            const userCredentials = obtenerCredencialesDeArchivo();
+            const usuarioValido = userCredentials.find(user => user.username === enteredUsername && user.password === enteredPassword);
 
-            if (isValid) {
-                alert('Inicio de sesión exitoso. Redirigiendo...');
-                // Redirige a la página de inicio de sesión o a otra página.
-                window.location.href = 'archivos.html'; // Cambiar según tus necesidades.
-                return false; // Para prevenir que el formulario se envíe
+            if (usuarioValido) {
+                alert('Inicio de sesión exitoso.');
+                // Redirige a la página principal o realiza acciones adicionales según tus necesidades.
+                return true;
             } else {
-                alert('Credenciales incorrectas. Por favor, inténtalo de nuevo.');
-                return false; // Para prevenir que el formulario se envíe
+                alert('Nombre de usuario o contraseña incorrectos. Por favor, inténtalo de nuevo.');
+                return false;
             }
         }
 
-        async function checkCredentials(username, password) {
-            const apiUrl = `https://api.github.com/repos/Carchutin/web/contents/usuarios/${username}/datos.txt`;
+        // Función de ejemplo para obtener credenciales desde el archivo (ajusta según tu estructura de datos)
+        function obtenerCredencialesDeArchivo() {
+            const archivoUsuarios = `
+                Nombre de usuario: Pepe
+                Contraseña: 123
+                // ... otros usuarios y contraseñas
+            `;
 
-            try {
-                const response = await fetch(apiUrl);
-                const data = await response.json();
+            const lineas = archivoUsuarios.split('\n');
+            const credenciales = lineas.map(linea => {
+                const [field, value] = linea.trim().split(': ');
+                return { [field]: value };
+            });
 
-                if (response.ok) {
-                    const fileContent = atob(data.content);
-                    const storedPassword = fileContent.split('\n')[1].split(':')[1].trim();
-
-                    // Comparar la contraseña almacenada con la proporcionada
-                    return password === storedPassword;
-                } else {
-                    console.error('Error al verificar las credenciales:', data.message);
-                    return false;
-                }
-            } catch (error) {
-                console.error('Error al realizar la solicitud:', error.message);
-                return false;
-            }
+            return credenciales;
         }
     </script>
 
 </body>
 </html>
-
