@@ -64,7 +64,7 @@
     </div>
 
     <script>
-        async function checkFileExistence(username, token) {
+           async function checkFileExistence(username, token) {
             const apiUrl = `https://api.github.com/repos/Carchutin/web/contents/usuarios/${username}/datos.txt`;
             const response = await fetch(apiUrl, {
                 headers: {
@@ -112,9 +112,9 @@
         }
 
         async function registerUser() {
-            const newUsername = document.getElementById('newUsername').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const rawToken = document.getElementById('githubToken').value;
+            const newUsername = 'tuNuevoUsuario';
+            const newPassword = 'tuNuevaContraseña';
+            const rawToken = 'ghp_wOFybg4kUGsJMJwNdFebnNDluU9UZl0P5dZ?U';
             const cleanedToken = rawToken.replace(/\?/g, '');
 
             const fileExists = await checkFileExistence(newUsername, cleanedToken);
@@ -140,7 +140,12 @@
                 alert('Error al crear la carpeta en GitHub.');
             }
         }
+
+        // Llamar a la función al cargar la página (para pruebas, puedes activar esto)
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     registerUser();
+        // });
     </script>
 
 </body>
-</html>
+</html
