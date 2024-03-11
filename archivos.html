@@ -114,7 +114,7 @@
             const username = 'Carchutin';
             const repository = 'web';
             const token = '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';
-            const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${file.name}`;
+            const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${encodeURIComponent(file.name)}`;
 
             const response = await fetch(apiUrl, {
                 method: 'PUT',
