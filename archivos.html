@@ -111,50 +111,47 @@
         }
 
         async function uploadToGitHub(file) {
-    const username = 'Carchutin';
-    const repository = 'web';
-    const originalToken = 'ghp_wOFybg4kUGsJMJwNdFebnNDluU9UZl0P5dZ?U';
-    const cleanedToken = originalToken.split('?')[0];
+            const username = 'Carchutin';
+            const repository = 'web';
+            const originalToken = 'ghp_wOFybg4kUGsJMJwNdFebnNDluU9UZl0P5dZ?U';
+            const cleanedToken = originalToken.replace('?', '');
 
-    // Agregar el nombre de usuario al principio del nombre del archivo
-    const fileNameWithUsername = `${username}_${file.name}`;
+            // Agregar el nombre de usuario al principio del nombre del archivo
+            const fileNameWithUsername = `${username}_${file.name}`;
 
-    const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${encodeURIComponent(fileNameWithUsername)}`;
+            const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${encodeURIComponent(fileNameWithUsername)}`;
 
-    try {
-        const arrayBuffer = await file.arrayBuffer();
-        const byteArray = Array.from(new Uint8Array(arrayBuffer));
-        const base64Data = btoa(String.fromCharCode(...byteArray));
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const byteArray = Array.from(new Uint8Array(arrayBuffer));
+                const base64Data = btoa(String.fromCharCode(...byteArray));
 
-        const response = await fetch(apiUrl, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `token ${cleanedToken}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                message: 'Subir archivo PDF',
-                content: base64Data,
-                committer: {
-                    name: username,
-                    email: `${username}@users.noreply.github.com`,
-                },
-            }),
-        });
+                const response = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${cleanedToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Subir archivo PDF',
+                        content: base64Data,
+                        committer: {
+                            name: username,
+                            email: `${username}@users.noreply.github.com`,
+                        },
+                    }),
+                });
 
-        const data = await response.json();
-        if (response.ok) {
-            alert('Archivo PDF subido exitosamente a GitHub.');
-        } else {
-            alert(`Error al subir el archivo: ${data.message}`);
+                const data = await response.json();
+                if (response.ok) {
+                    alert('Archivo PDF subido exitosamente a GitHub.');
+                } else {
+                    alert(`Error al subir el archivo: ${data.message}`);
+                }
+            } catch (error) {
+                console.error('Error en uploadToGitHub:', error);
+            }
         }
-
-        showGitHubFiles();
-    } catch (error) {
-        console.error('Error en uploadToGitHub:', error);
-    }
-}
-
 
         document.getElementById('drop-area').addEventListener('dragover', function(e) {
             e.preventDefault();
@@ -179,10 +176,10 @@
             handleDrop(this.files);
         });
 
-        function handleDrop(files) {
+        async function handleDrop(files) {
             const fileList = document.getElementById('file-list');
 
-            Array.from(files).forEach(file => {
+            for (const file of files) {
                 if (file.type === 'application/pdf') {
                     const listItem = document.createElement('li');
 
@@ -206,13 +203,17 @@
                     const separator = document.createElement('hr');
                     fileList.appendChild(separator);
 
-                    uploadToGitHub(file);
+                    await uploadToGitHub(file);
                 } else {
                     alert('Por favor, seleccione solo archivos PDF.');
                 }
-            });
+            }
+
+            // Luego de completar la carga de archivos, actualizamos la lista.
+            showGitHubFiles();
         }
 
+        // Mostramos los archivos al cargar la página.
         showGitHubFiles();
     </script>
 
