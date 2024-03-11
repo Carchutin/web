@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Made In Verse - Subir Archivos PDF</title>
+    <title>Made In Verse - Subir y Mostrar Archivos PDF</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -42,11 +42,11 @@
             margin-right: 10px;
             width: 24px;
             height: 24px;
-            cursor: pointer; /* Añadido para mostrar que es clickeable */
+            cursor: pointer;
         }
 
         hr {
-            width: 180%; /* Cambiado a 90% para hacer la línea más larga */
+            width: 90%;
             margin: 10px 0;
             border: 1px solid #ccc;
         }
@@ -63,7 +63,6 @@
     <ul id="file-list"></ul>
 
     <script>
-        // Función para obtener la lista de archivos PDF en GitHub
         async function getGitHubFiles() {
             const username = 'Carchutin';
             const repository = 'web';
@@ -80,29 +79,25 @@
             }
         }
 
-        // Función para mostrar los archivos PDF desde GitHub
         async function showGitHubFiles() {
             const fileList = document.getElementById('file-list');
-            fileList.innerHTML = ''; // Limpiar la lista
+            fileList.innerHTML = '';
 
             const githubFiles = await getGitHubFiles();
 
             githubFiles.forEach(file => {
                 const listItem = document.createElement('li');
 
-                // Agrega un evento para abrir el PDF en una nueva ventana al hacer clic en el icono y el nombre del archivo
                 const openPdf = function () {
                     window.open(file.download_url, '_blank');
                 };
 
-                // Icono
                 const icon = document.createElement('img');
-                icon.src = 'pdf-icon.png'; // Coloca la ruta correcta a tu icono de PDF
+                icon.src = 'pdf-icon.png';
                 icon.alt = 'PDF Icon';
                 icon.addEventListener('click', openPdf);
                 listItem.appendChild(icon);
 
-                // Nombre del archivo
                 const fileName = document.createElement('span');
                 fileName.textContent = file.name;
                 fileName.addEventListener('click', openPdf);
@@ -110,16 +105,14 @@
 
                 fileList.appendChild(listItem);
 
-                // Línea de separación
                 const separator = document.createElement('hr');
                 fileList.appendChild(separator);
             });
         }
 
-        // Función para subir el archivo a GitHub
         async function uploadToGitHub(file) {
             const username = 'Carchutin';
-            const repository = 'web';
+            const repository = 'Tweb';
             const token = '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';
             const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${file.name}`;
 
@@ -131,7 +124,7 @@
                 },
                 body: JSON.stringify({
                     message: 'Subir archivo PDF',
-                    content: btoa(await file.arrayBuffer()), // Convierte el contenido del archivo a base64
+                    content: btoa(await file.arrayBuffer()),
                     committer: {
                         name: username,
                         email: `${username}@users.noreply.github.com`,
@@ -146,14 +139,9 @@
                 alert(`Error al subir el archivo: ${data.message}`);
             }
 
-            // Actualizar la lista después de subir nuevos archivos
             showGitHubFiles();
         }
 
-        // Resto del código omitido para mayor claridad
-        // ...
-
-        // Llamada para mostrar archivos al cargar la página
         showGitHubFiles();
 
         document.getElementById('drop-area').addEventListener('dragover', function(e) {
@@ -182,23 +170,20 @@
         function handleDrop(files) {
             const fileList = document.getElementById('file-list');
 
-            files.forEach(file => {
+            Array.from(files).forEach(file => {
                 if (file.type === 'application/pdf') {
                     const listItem = document.createElement('li');
 
-                    // Agrega un evento para abrir el PDF en una nueva ventana al hacer clic en el icono y el nombre del archivo
                     const openPdf = function () {
                         window.open(URL.createObjectURL(file), '_blank');
                     };
 
-                    // Icono
                     const icon = document.createElement('img');
-                    icon.src = 'pdf-icon.png'; // Coloca la ruta correcta a tu icono de PDF
+                    icon.src = 'pdf-icon.png';
                     icon.alt = 'PDF Icon';
                     icon.addEventListener('click', openPdf);
                     listItem.appendChild(icon);
 
-                    // Nombre del archivo
                     const fileName = document.createElement('span');
                     fileName.textContent = file.name;
                     fileName.addEventListener('click', openPdf);
@@ -206,11 +191,9 @@
 
                     fileList.appendChild(listItem);
 
-                    // Línea de separación
                     const separator = document.createElement('hr');
                     fileList.appendChild(separator);
 
-                    // Añadir la llamada para subir a GitHub
                     uploadToGitHub(file);
                 } else {
                     alert('Por favor, seleccione solo archivos PDF.');
