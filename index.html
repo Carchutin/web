@@ -60,7 +60,7 @@
 
     <div class="login-container">
         <h1>Made In Verse</h1>
-        <form onsubmit="return isValidUser()">
+        <form onsubmit="return login()">
             <label for="username">Nombre de Usuario:</label>
             <input type="text" id="username" name="username" required>
 
@@ -76,41 +76,40 @@
     </div>
 
     <script>
-        function isValidUser() {
+        async function fetchUserData() {
+            const apiUrl = 'https://api.github.com/repos/Carchutin/web/contents/usuarios.txt';
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+
+            const decodedContent = atob(data.content);
+            const userData = decodedContent.split('\n')
+                .map(line => line.split(':').map(item => item.trim()));
+
+            return userData.reduce((acc, [key, value]) => {
+                acc[key] = value;
+                return acc;
+            }, {});
+        }
+
+        async function login() {
             const enteredUsername = document.getElementById('username').value;
             const enteredPassword = document.getElementById('password').value;
 
-            // Realiza la lógica de validación con tus datos almacenados
-            const userCredentials = obtenerCredencialesDeArchivo();
-            const usuarioValido = userCredentials.find(user => user.username === enteredUsername && user.password === enteredPassword);
+            const userData = await fetchUserData();
 
-            if (usuarioValido) {
-                alert('Inicio de sesión exitoso.');
-                // Redirige a la página principal o realiza acciones adicionales según tus necesidades.
-                return true;
+            if (userData['Nombre de usuario'] === enteredUsername && userData['Contraseña'] === enteredPassword) {
+                alert('Inicio de sesión exitoso');
+                // Redirigir a la página de inicio o realizar otras acciones.
             } else {
-                alert('Nombre de usuario o contraseña incorrectos. Por favor, inténtalo de nuevo.');
-                return false;
+                alert('Nombre de usuario o contraseña incorrectos');
+                // Puedes redirigir a otra página o realizar otras acciones en caso de error.
             }
-        }
 
-        // Función de ejemplo para obtener credenciales desde el archivo (ajusta según tu estructura de datos)
-        function obtenerCredencialesDeArchivo() {
-            const archivoUsuarios = `
-                Nombre de usuario: Pepe
-                Contraseña: 123
-                // ... otros usuarios y contraseñas
-            `;
-
-            const lineas = archivoUsuarios.split('\n');
-            const credenciales = lineas.map(linea => {
-                const [field, value] = linea.trim().split(': ');
-                return { [field]: value };
-            });
-
-            return credenciales;
+            // Devolvemos false para evitar que el formulario se envíe realmente.
+            return false;
         }
     </script>
 
 </body>
 </html>
+
