@@ -115,7 +115,8 @@
             const repository = 'web';
             const originalToken = 'ghp_wOFybg4kUGsJMJwNdFebnNDluU9UZl0P5dZ?U';
             const cleanedToken = originalToken.replace('?', '');
-            const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${encodeURIComponent(file.name)}`;
+            const filenameWithUsername = `${username}_${file.name}`;
+            const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${encodeURIComponent(filenameWithUsername)}`;
 
             const arrayBuffer = await file.arrayBuffer();
             const byteArray = Array.from(new Uint8Array(arrayBuffer));
@@ -209,5 +210,6 @@
 
 </body>
 </html>
+
 
                
