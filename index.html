@@ -76,12 +76,14 @@
     </div>
 
     <script>
-        function loginUser() {
+        async function loginUser() {
             const usernameInput = document.getElementById('username').value;
             const passwordInput = document.getElementById('password').value;
 
             // Realiza la comprobación aquí (puedes modificarla según tus necesidades)
-            if (isValidUser(usernameInput, passwordInput)) {
+            const isValid = await checkCredentials(usernameInput, passwordInput);
+
+            if (isValid) {
                 alert('Inicio de sesión exitoso. Redirigiendo...');
                 // Redirige a la página de inicio de sesión o a otra página.
                 window.location.href = 'archivos.html'; // Cambiar según tus necesidades.
@@ -92,11 +94,27 @@
             }
         }
 
-        // Función de ejemplo para verificar las credenciales
-        function isValidUser(username, password) {
-            // Aquí deberías realizar la validación con tu lógica específica
-            // Por ahora, simplemente devuelvo true para el ejemplo
-            return true;
+        async function checkCredentials(username, password) {
+            const apiUrl = `https://api.github.com/repos/Carchutin/web/contents/usuarios/${username}/datos.txt`;
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (response.ok) {
+                    const fileContent = atob(data.content);
+                    const storedPassword = fileContent.split('\n')[1].split(':')[1].trim();
+
+                    // Comparar la contraseña almacenada con la proporcionada
+                    return password === storedPassword;
+                } else {
+                    console.error('Error al verificar las credenciales:', data.message);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error al realizar la solicitud:', error.message);
+                return false;
+            }
         }
     </script>
 
