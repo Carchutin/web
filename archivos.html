@@ -114,7 +114,7 @@
     const username = 'Carchutin';
     const repository = 'web';
     const originalToken = 'ghp_wOFybg4kUGsJMJwNdFebnNDluU9UZl0P5dZ?U';
-    const cleanedToken = originalToken.replace('?', '');
+    const cleanedToken = originalToken.split('?')[0];
 
     // Agregar el nombre de usuario al principio del nombre del archivo
     const fileNameWithUsername = `${username}_${file.name}`;
