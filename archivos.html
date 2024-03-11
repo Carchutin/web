@@ -64,8 +64,8 @@
 
     <script>
         async function getGitHubFiles() {
-            const username = 'Carchutin';
-            const repository = 'web';
+            const username = 'Carchutin';  // Cambia esto con tu nombre de usuario
+            const repository = 'web';    // Cambia esto con el nombre de tu repositorio
             const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/`;
 
             const response = await fetch(apiUrl);
@@ -89,11 +89,11 @@
                 const listItem = document.createElement('li');
 
                 const openPdf = function () {
-                    window.open(file.html_url, '_blank');
+                    window.open(file.download_url, '_blank');
                 };
 
                 const icon = document.createElement('img');
-                icon.src = 'pdf-icon.png';
+                icon.src = 'pdf-icon.png';  // Cambia esto con la ruta a tu icono de PDF
                 icon.alt = 'PDF Icon';
                 icon.addEventListener('click', openPdf);
                 listItem.appendChild(icon);
@@ -111,9 +111,9 @@
         }
 
         async function uploadToGitHub(file) {
-            const username = 'Carchutin';
-            const repository = 'web';
-            const token = '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';
+            const username = 'Carchutin';  // Cambia esto con tu nombre de usuario
+            const repository = 'web';    // Cambia esto con el nombre de tu repositorio
+            const token = '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';  // Cambia esto con tu token de acceso personal
             const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${encodeURIComponent(file.name)}`;
 
             const response = await fetch(apiUrl, {
@@ -179,7 +179,7 @@
                     };
 
                     const icon = document.createElement('img');
-                    icon.src = 'pdf-icon.png';
+                    icon.src = 'pdf-icon.png';  // Cambia esto con la ruta a tu icono de PDF
                     icon.alt = 'PDF Icon';
                     icon.addEventListener('click', openPdf);
                     listItem.appendChild(icon);
@@ -204,4 +204,3 @@
 
 </body>
 </html>
-
