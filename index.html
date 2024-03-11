@@ -71,7 +71,7 @@
         </form>
 
         <div class="register-button">
-            <p>¿No tienes una cuenta? <a href="registro.html">Regístrate aquí</a>.</p>
+            <p>¿No tienes una cuenta? <a href="archivos.html">Regístrate aquí</a>.</p>
         </div>
     </div>
 
@@ -103,7 +103,7 @@
 
                 if (userData['Nombre de usuario'] === enteredUsername && userData['Contraseña'] === enteredPassword) {
                                         
-                    window.location.replace('archivos.html');
+                   window.location.href = "archivos.html";
                     
                 } else {
                     alert('Nombre de usuario o contraseña incorrectos');
