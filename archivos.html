@@ -64,8 +64,8 @@
 
     <script>
         async function getGitHubFiles() {
-            const username = 'Carchutin';  // Cambia esto con tu nombre de usuario
-            const repository = 'web';    // Cambia esto con el nombre de tu repositorio
+            const username = 'Carchutin';  
+            const repository = 'web';    
             const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/`;
 
             const response = await fetch(apiUrl);
@@ -111,9 +111,9 @@
         }
 
         async function uploadToGitHub(file) {
-            const username = 'Carchutin';  // Cambia esto con tu nombre de usuario
-            const repository = 'web';    // Cambia esto con el nombre de tu repositorio
-            const token = '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';  // Cambia esto con tu token de acceso personal
+            const username = 'Carchutin';  
+            const repository = 'web';    
+            const token = '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';  
             const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${encodeURIComponent(file.name)}`;
 
             const response = await fetch(apiUrl, {
