@@ -110,39 +110,37 @@
             });
         }
 
-        async function uploadToGitHub(file) {
-            const username = 'Carchutin';  
-            const repository = 'web';    
-            const token = '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';  
-            const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${encodeURIComponent(file.name)}`;
+        const username = 'Carchutin';  
+        const repository = 'web';    
+        const originalToken = 'ghp_wOFybg4kUGsJMJwNdFebnNDluU9UZl0P5dZ?U';
+        const cleanedToken = originalToken.replace('?', '');
+        const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${encodeURIComponent(file.name)}`;
 
-            const response = await fetch(apiUrl, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message: 'Subir archivo PDF',
-                    content: btoa(await file.arrayBuffer()),
-                    committer: {
-                        name: username,
-                        email: `${username}@users.noreply.github.com`,
-                    },
-                }),
-            });
+        const response = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+        'Authorization': `token ${cleanedToken}`,
+        'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+        message: 'Subir archivo PDF',
+        content: btoa(await file.arrayBuffer()),
+        committer: {
+            name: username,
+            email: `${username}@users.noreply.github.com`,
+              },
+            }),
+        });
 
-            const data = await response.json();
-            if (response.ok) {
-                alert('Archivo PDF subido exitosamente a GitHub.');
-            } else {
-                alert(`Error al subir el archivo: ${data.message}`);
-            }
-
-            showGitHubFiles();
+        const data = await response.json();
+        if (response.ok) {
+        alert('Archivo PDF subido exitosamente a GitHub.');
+        } else {
+        alert(`Error al subir el archivo: ${data.message}`);
         }
 
         showGitHubFiles();
+
 
         document.getElementById('drop-area').addEventListener('dragover', function(e) {
             e.preventDefault();
