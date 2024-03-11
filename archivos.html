@@ -21,8 +21,8 @@
     <script>
         // Función para obtener la lista de archivos PDF en GitHub
         async function getGitHubFiles() {
-            const username = 'Carchutin';
-            const repository = 'web';
+            const username = 'TU_USUARIO';
+            const repository = 'TU_REPOSITORIO';
             const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/`;
 
             const response = await fetch(apiUrl);
@@ -72,6 +72,40 @@
             });
         }
 
+        // Función para subir el archivo a GitHub
+        async function uploadToGitHub(file) {
+            const username = 'TU_USUARIO';
+            const repository = 'TU_REPOSITORIO';
+            const token = 'TU_TOKEN';
+            const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${file.name}`;
+
+            const response = await fetch(apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: 'Subir archivo PDF',
+                    content: btoa(await file.arrayBuffer()), // Convierte el contenido del archivo a base64
+                    committer: {
+                        name: username,
+                        email: `${username}@users.noreply.github.com`,
+                    },
+                }),
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                alert('Archivo PDF subido exitosamente a GitHub.');
+            } else {
+                alert(`Error al subir el archivo: ${data.message}`);
+            }
+
+            // Actualizar la lista después de subir nuevos archivos
+            showGitHubFiles();
+        }
+
         // Resto del código omitido para mayor claridad
         // ...
 
@@ -92,9 +126,6 @@
                     alert('Por favor, seleccione solo archivos PDF.');
                 }
             });
-
-            // Actualizar la lista después de subir nuevos archivos
-            showGitHubFiles();
         }
     </script>
 
