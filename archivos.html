@@ -112,8 +112,8 @@
 
         async function uploadToGitHub(file) {
             const username = 'Carchutin';
-            const repository = 'Tweb';
-            const token = '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';
+            const repository = 'web';
+            const token = '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';
             const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${file.name}`;
 
             const response = await fetch(apiUrl, {
