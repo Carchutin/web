@@ -117,6 +117,10 @@
             const cleanedToken = originalToken.replace('?', '');
             const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${encodeURIComponent(file.name)}`;
 
+            const arrayBuffer = await file.arrayBuffer();
+            const byteArray = Array.from(new Uint8Array(arrayBuffer));
+            const base64Data = btoa(String.fromCharCode(...byteArray));
+
             const response = await fetch(apiUrl, {
                 method: 'PUT',
                 headers: {
@@ -125,7 +129,7 @@
                 },
                 body: JSON.stringify({
                     message: 'Subir archivo PDF',
-                    content: btoa(await file.arrayBuffer()),
+                    content: base64Data,
                     committer: {
                         name: username,
                         email: `${username}@users.noreply.github.com`,
@@ -196,12 +200,4 @@
                     uploadToGitHub(file);
                 } else {
                     alert('Por favor, seleccione solo archivos PDF.');
-                }
-            });
-        }
-
-        showGitHubFiles();
-    </script>
-
-</body>
-</html>
+               
