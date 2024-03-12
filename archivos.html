@@ -110,10 +110,6 @@
             });
         }
 
-        function delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
         async function uploadToGitHub(file) {
             const username = 'Carchutin';
             const repository = 'web';
@@ -207,9 +203,7 @@
                     const separator = document.createElement('hr');
                     fileList.appendChild(separator);
 
-                    // Agregamos un pequeño retraso para evitar el error de desbordamiento de la pila de llamadas.
-                    await delay(500);
-
+                    // Cargamos el archivo de manera asíncrona
                     await uploadToGitHub(file);
                 } else {
                     alert('Por favor, seleccione solo archivos PDF.');
