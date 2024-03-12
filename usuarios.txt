@@ -1,8 +1,2 @@
 Nombre de usuario: Ian
 Contraseña: 123
-
-Nombre de usuario: Pepe
-Contraseña: 123
-
-Nombre de usuario: Maria
-Contraseña: 123
