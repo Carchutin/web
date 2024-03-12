@@ -89,7 +89,7 @@
                 const listItem = document.createElement('li');
 
                 const openPdf = function () {
-                    window.open(file.download_url, '_blank');
+                    window.open(file.html_url, '_blank');
                 };
 
                 const icon = document.createElement('img');
@@ -181,7 +181,7 @@
                     const listItem = document.createElement('li');
 
                     const openPdf = function () {
-                        window.open(URL.createObjectURL(file), '_blank');
+                        window.open(file.html_url, '_blank');
                     };
 
                     const icon = document.createElement('img');
