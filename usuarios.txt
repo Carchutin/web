@@ -1,6 +1,10 @@
 Nombre de usuario: Ian
-Contraseña: 123
+ContraseĂąa: 123
 
 Nombre de usuario: Pepe
+Contraseńa: 123
+
+
+Nombre de usuario: Carlos
 Contrase�a: 123
 
