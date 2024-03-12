@@ -4,7 +4,3 @@ Nombre de usuario: Maria
 Contrasena: 123
 Nombre de usuario: Carlos
 Contrasena: 123
-Nombre de usuario: Juan
-Contrasena: 123
-Nombre de usuario: Jose
-Contrasena: 123
