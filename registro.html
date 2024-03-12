@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Made In Verse - Registro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .register-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="register-container">
+    <h1>Registro en Made In Verse</h1>
+    <form id="registrationForm">
+        <label for="newUsername">Nuevo Nombre de Usuario:</label>
+        <input type="text" id="newUsername" name="newUsername" required>
+
+        <label for="newPassword">Nueva Contraseña:</label>
+        <input type="password" id="newPassword" name="newPassword" required>
+
+        <button type="button" onclick="registerUser()">Registrarse</button>
+    </form>
+</div>
+
+<script>
+    async function checkUserExistence(username, token) {
+        const apiUrl = 'https://api.github.com/repos/Carchutin/web/contents/usuarios.txt';
+        const response = await fetch(apiUrl, {
+            headers: {
+                'Authorization': `token ${token}`,
+            },
+        });
+
+        if (!response.ok) {
+            return false; // No se pudo acceder al archivo de usuarios
+        }
+
+        const data = await response.json();
+        const content = atob(data.content); // Decodificar contenido base64
+        return content.includes(`Nombre de usuario: ${username}`);
+    }
+
+    async function registerUser() {
+        const newUsername = document.getElementById('newUsername').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const rawToken = 'ghp_wOFybg4kUGsJMJwNdFebnNDluU9UZl0P5dZ?U';
+        const cleanedToken = rawToken.replace(/\?/g, '');
+
+        const userExists = await checkUserExistence(newUsername, cleanedToken);
+
+        if (userExists) {
+            alert('Ya existe un usuario con ese nombre. Por favor, elija otro.');
+            return;
+        }
+
+        const apiUrl = 'https://api.github.com/repos/Carchutin/web/contents/usuarios.txt';
+
+        // Obtener información actual del archivo
+        const response = await fetch(apiUrl, {
+            headers: {
+                'Authorization': `token ${cleanedToken}`,
+            },
+        });
+
+        if (!response.ok) {
+            alert('Error al obtener datos del usuario.');
+            return;
+        }
+
+        const data = await response.json();
+        const currentContent = atob(data.content);
+
+        // Crear nuevo contenido con el usuario agregado
+        const newContent = `${currentContent}\nNombre de usuario: ${newUsername}\nContraseña: ${newPassword}\n\n`;
+
+        const putResponse = await fetch(apiUrl, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${cleanedToken}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: `Agregar usuario ${newUsername}`,
+                content: btoa(newContent),
+                sha: data.sha,
+            }),
+        });
+
+        if (putResponse.ok) {
+            alert('Usuario registrado exitosamente.');
+            // Redirigir a la página de inicio de sesión o a otra página.
+            window.location.href = 'index.html'; // Cambiar según tus necesidades.
+        } else {
+            alert('Error al registrar el usuario.');
+        }
+    }
+</script>
+
+</body>
+</html>
+
