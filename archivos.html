@@ -89,7 +89,8 @@
                 const listItem = document.createElement('li');
 
                 const openPdf = function () {
-                    window.open(file.download_url, '_blank');
+                    // Modificado para abrir el PDF en la misma ventana
+                    window.location.href = file.download_url;
                 };
 
                 const icon = document.createElement('img');
@@ -174,7 +175,8 @@
                     const listItem = document.createElement('li');
 
                     const openPdf = function () {
-                        window.open(URL.createObjectURL(file), '_blank');
+                        // Modificado para abrir el PDF en la misma ventana
+                        window.location.href = file.download_url;
                     };
 
                     const icon = document.createElement('img');
