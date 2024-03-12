@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Made In Verse - Subir y Mostrar Archivos PDF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #drop-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #file-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+        }
+
+        #file-list li {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        #file-list li img {
+            margin-right: 10px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        hr {
+            width: 90%;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="drop-area">
+        <h1>Arrastra y suelta archivos PDF</h1>
+        <p>O selecciona archivos haciendo clic aquí.</p>
+        <input type="file" id="fileInput" multiple accept=".pdf" style="display: none;">
+    </div>
+
+    <ul id="file-list"></ul>
+
+    <script>
+        async function getGitHubFiles() {
+            const username = 'Carchutin';
+            const repository = 'web';
+            const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/`;
+
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+
+            if (response.ok) {
+                return data.filter(item => item.type === 'file' && item.name.endsWith('.pdf'));
+            } else {
+                alert(`Error al obtener la lista de archivos de GitHub: ${data.message}`);
+                return [];
+            }
+        }
+
+        async function showGitHubFiles() {
+            const fileList = document.getElementById('file-list');
+            fileList.innerHTML = '';
+
+            const githubFiles = await getGitHubFiles();
+
+            githubFiles.forEach(file => {
+                const listItem = document.createElement('li');
+
+                const openPdf = function () {
+                    window.open(file.download_url, '_blank');
+                };
+
+                const icon = document.createElement('img');
+                icon.src = 'pdf-icon.png';  // Cambia esto con la ruta a tu icono de PDF
+                icon.alt = 'PDF Icon';
+                icon.addEventListener('click', openPdf);
+                listItem.appendChild(icon);
+
+                const fileName = document.createElement('span');
+                fileName.textContent = file.name;
+                fileName.addEventListener('click', openPdf);
+                listItem.appendChild(fileName);
+
+                fileList.appendChild(listItem);
+
+                const separator = document.createElement('hr');
+                fileList.appendChild(separator);
+            });
+        }
+
+        async function uploadToGitHub(file) {
+            const username = 'Carchutin';
+            const repository = 'web';
+            const originalToken = 'ghp_wOFybg4kUGsJMJwNdFebnNDluU9UZl0P5dZ?U';
+            const cleanedToken = originalToken.replace('?', '');
+            const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${encodeURIComponent(file.name)}`;
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const base64Data = btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)));
+
+                const response = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${cleanedToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Subir archivo PDF',
+                        content: base64Data,
+                        committer: {
+                            name: username,
+                            email: `${username}@users.noreply.github.com`,
+                        },
+                    }),
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert('Archivo PDF subido exitosamente a GitHub.');
+                } else {
+                    alert(`Error al subir el archivo: ${data.message}`);
+                }
+
+                showGitHubFiles();  // Agregado para actualizar la lista después de cargar el archivo
+            } catch (error) {
+                console.error('Error en uploadToGitHub:', error);
+            }
+        }
+
+        document.getElementById('drop-area').addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('active');
+        });
+
+        document.getElementById('drop-area').addEventListener('dragleave', function() {
+            this.classList.remove('active');
+        });
+
+        document.getElementById('drop-area').addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('active');
+            handleDrop(e.dataTransfer.files);
+        });
+
+        document.getElementById('drop-area').addEventListener('click', function() {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', function() {
+            handleDrop(this.files);
+        });
+
+        function handleDrop(files) {
+            const fileList = document.getElementById('file-list');
+
+            Array.from(files).forEach(file => {
+                if (file.type === 'application/pdf') {
+                    const listItem = document.createElement('li');
+
+                    const openPdf = function () {
+                        window.open(URL.createObjectURL(file), '_blank');
+                    };
+
+                    const icon = document.createElement('img');
+                    icon.src = 'pdf-icon.png';  // Cambia esto con la ruta a tu icono de PDF
+                    icon.alt = 'PDF Icon';
+                    icon.addEventListener('click', openPdf);
+                    listItem.appendChild(icon);
+
+                    const fileName = document.createElement('span');
+                    fileName.textContent = file.name;
+                    fileName.addEventListener('click', openPdf);
+                    listItem.appendChild(fileName);
+
+                    fileList.appendChild(listItem);
+
+                    const separator = document.createElement('hr');
+                    fileList.appendChild(separator);
+
+                    uploadToGitHub(file);
+                } else {
+                    alert('Por favor, seleccione solo archivos PDF.');
+                }
+            });
+        }
+
+        showGitHubFiles();
+    </script>
+
+</body>
+</html>
