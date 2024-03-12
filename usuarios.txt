@@ -1,7 +1,3 @@
-Nombre de usuario: Carlos
-Contraseńa: 123
-
-
 Nombre de usuario: Pepe
-Contrase�a: 123
+Contraseńa: 123
 
