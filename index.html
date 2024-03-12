@@ -86,10 +86,13 @@
             }
 
             const decodedContent = await response.text();
-            const userData = decodedContent.split('\n')
-                .map(line => line.split(':').map(item => item.trim()));
+            const userData = decodedContent.split('\n\n')
+                .map(user => user.split('\n')
+                    .map(line => line.split(':').map(item => item.trim()))
+                    .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
+                );
 
-            return userData.map(([key, value]) => ({ [key]: value }));
+            return userData;
         }
 
         async function login() {
@@ -117,5 +120,3 @@
 
 </body>
 </html>
-
-
