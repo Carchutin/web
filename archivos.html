@@ -119,7 +119,7 @@
 
             try {
                 const arrayBuffer = await file.arrayBuffer();
-                const base64Data = arrayBufferToBase64(arrayBuffer);
+                const base64Data = btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)));
 
                 const response = await fetch(apiUrl, {
                     method: 'PUT',
@@ -144,7 +144,7 @@
                     alert(`Error al subir el archivo: ${data.message}`);
                 }
 
-                showGitHubFiles();
+                showGitHubFiles();  // Agregado para actualizar la lista después de cargar el archivo
             } catch (error) {
                 console.error('Error en uploadToGitHub:', error);
             }
@@ -205,16 +205,6 @@
                     alert('Por favor, seleccione solo archivos PDF.');
                 }
             });
-        }
-
-        function arrayBufferToBase64(arrayBuffer) {
-            let binary = '';
-            const bytes = new Uint8Array(arrayBuffer);
-            const len = bytes.byteLength;
-            for (let i = 0; i < len; i++) {
-                binary += String.fromCharCode(bytes[i]);
-            }
-            return btoa(binary);
         }
 
         showGitHubFiles();
