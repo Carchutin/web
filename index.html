@@ -89,10 +89,7 @@
             const userData = decodedContent.split('\n')
                 .map(line => line.split(':').map(item => item.trim()));
 
-            return userData.reduce((acc, [key, value]) => {
-                acc[key] = value;
-                return acc;
-            }, {});
+            return userData.map(([key, value]) => ({ username: key, password: value }));
         }
 
         async function login() {
@@ -100,10 +97,12 @@
             const enteredPassword = document.getElementById('password').value;
 
             try {
-                const userData = await fetchUserData();
+                const users = await fetchUserData();
 
-                // Verificar si el usuario existe y las credenciales son correctas
-                if (userData['Nombre de usuario'] === enteredUsername && userData['Contraseña'] === enteredPassword) {
+                // Verificar si las credenciales coinciden con algún usuario
+                const user = users.find(u => u.username === enteredUsername && u.password === enteredPassword);
+
+                if (user) {
                     // Redirigir a la página de archivos si las credenciales son correctas
                     window.location.href = 'archivos.html';
                 } else {
@@ -123,5 +122,3 @@
 
 </body>
 </html>
-
-
