@@ -3,137 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Made In Verse - Registro</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .register-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #4caf50;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <title>Registro de Usuario</title>
 </head>
 <body>
 
-<div class="register-container">
-    <h1>Registro en Made In Verse</h1>
-    <form id="registrationForm">
-        <label for="newUsername">Nuevo Nombre de Usuario:</label>
-        <input type="text" id="newUsername" name="newUsername" required>
+    <h1>Registro de Usuario</h1>
 
-        <label for="newPassword">Nueva Contraseña:</label>
-        <input type="password" id="newPassword" name="newPassword" required>
+    <form id="registroForm">
+        <label for="usuario">Usuario:</label>
+        <input type="text" id="usuario" name="usuario" required>
 
-        <button type="button" onclick="registerUser()">Registrarse</button>
+        <label for="contrasena">Contraseña:</label>
+        <input type="password" id="contrasena" name="contrasena" required>
+
+        <button type="button" onclick="registrarUsuario()">Registrar</button>
     </form>
-</div>
 
-<script>
-    async function checkUserExistence(username, token) {
-        const apiUrl = 'https://api.github.com/repos/Carchutin/web/contents/usuarios.txt';
-        const response = await fetch(apiUrl, {
-            headers: {
-                'Authorization': `token ${token}`,
-            },
-        });
+    <script>
+        async function obtenerContenidoActual() {
+            const repoOwner = "Carchutin";
+            const repoName = "web";
+            const filePath = "usuarios.txt";
 
-        if (!response.ok) {
-            return false; // No se pudo acceder al archivo de usuarios
+            const apiEndpoint = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+
+            try {
+                const response = await fetch(apiEndpoint);
+                const responseData = await response.json();
+
+                if (response.ok) {
+                    return atob(responseData.content); // Decodifica el contenido desde base64
+                } else {
+                    console.error('Error al obtener el contenido actual:', responseData.message);
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error en la solicitud:', error);
+                return null;
+            }
         }
 
-        const data = await response.json();
-        const content = atob(data.content); // Decodificar contenido base64
-        return content.includes(`Nombre de usuario: ${username}`);
-    }
+        async function registrarUsuario() {
+            const usuario = document.getElementById("usuario").value;
+            const contrasena = document.getElementById("contrasena").value;
 
-    async function registerUser() {
-        const newUsername = document.getElementById('newUsername').value;
-        const newPassword = document.getElementById('newPassword').value;
-        const rawToken = 'ghp_wOFybg4kUGsJMJwNdFebnNDluU9UZl0P5dZ?U';
-        const cleanedToken = rawToken.replace(/\?/g, '');
+            const tokenConInterrogante = "ghp_wOFybg4kUGsJMJwNdFebnNDluU9UZl0P5dZ?U"; // Reemplaza con tu token
+            const tokenSinInterrogante = tokenConInterrogante.replace('?', '');
 
-        const userExists = await checkUserExistence(newUsername, cleanedToken);
+            const repoOwner = "Carchutin";
+            const repoName = "web";
+            const filePath = "usuarios.txt";
 
-        if (userExists) {
-            alert('Ya existe un usuario con ese nombre. Por favor, elija otro.');
-            return;
+            // Obtiene el contenido actual del archivo
+            const contenidoActual = await obtenerContenidoActual();
+
+            if (contenidoActual !== null) {
+                // Agrega los nuevos datos al contenido actual
+                const nuevoContenido = `${contenidoActual}\nUsuario: ${usuario}, Contraseña: ${contrasena}`;
+
+                // Realiza la actualización del archivo
+                const apiEndpoint = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+
+                try {
+                    const response = await fetch(apiEndpoint, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${tokenSinInterrogante}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: 'Actualizar datos de usuario',
+                            content: btoa(nuevoContenido), // Codifica el contenido en base64
+                            sha: null, // Si es nulo, GitHub creará un nuevo archivo
+                        }),
+                    });
+
+                    const responseData = await response.json();
+
+                    if (response.ok) {
+                        console.log('Datos registrados con éxito en usuarios.txt:', responseData.content);
+                    } else {
+                        console.error('Error al registrar datos en usuarios.txt:', responseData.message);
+                    }
+                } catch (error) {
+                    console.error('Error en la solicitud:', error);
+                }
+            }
         }
-
-        const apiUrl = 'https://api.github.com/repos/Carchutin/web/contents/usuarios.txt';
-
-        // Obtener información actual del archivo
-        const response = await fetch(apiUrl, {
-            headers: {
-                'Authorization': `token ${cleanedToken}`,
-            },
-        });
-
-        if (!response.ok) {
-            alert('Error al obtener datos del usuario.');
-            return;
-        }
-
-        const data = await response.json();
-        const currentContent = atob(data.content);
-
-        // Crear nuevo contenido con el usuario agregado
-        const newContent = `${currentContent}\nNombre de usuario: ${newUsername}\nContraseña: ${newPassword}\n\n`;
-
-        const putResponse = await fetch(apiUrl, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `token ${cleanedToken}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                message: `Agregar usuario ${newUsername}`,
-                content: btoa(newContent),
-                sha: data.sha,
-            }),
-        });
-
-        if (putResponse.ok) {
-            alert('Usuario registrado exitosamente.');
-            // Redirigir a la página de inicio de sesión o a otra página.
-            window.location.href = 'index.html'; // Cambiar según tus necesidades.
-        } else {
-            alert('Error al registrar el usuario.');
-        }
-    }
-</script>
+    </script>
 
 </body>
 </html>
-
