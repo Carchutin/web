@@ -117,30 +117,37 @@
             const cleanedToken = originalToken.replace('?', '');
             const apiUrl = `https://api.github.com/repos/${username}/${repository}/contents/${encodeURIComponent(file.name)}`;
 
-            const response = await fetch(apiUrl, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${cleanedToken}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message: 'Subir archivo PDF',
-                    content: btoa(await file.arrayBuffer()),
-                    committer: {
-                        name: username,
-                        email: `${username}@users.noreply.github.com`,
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const byteArray = Array.from(new Uint8Array(arrayBuffer));
+                const base64Data = btoa(String.fromCharCode(...byteArray));
+
+                const response = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${cleanedToken}`,
+                        'Content-Type': 'application/json',
                     },
-                }),
-            });
+                    body: JSON.stringify({
+                        message: 'Subir archivo PDF',
+                        content: base64Data,
+                        committer: {
+                            name: username,
+                            email: `${username}@users.noreply.github.com`,
+                        },
+                    }),
+                });
 
-            const data = await response.json();
-            if (response.ok) {
-                alert('Archivo PDF subido exitosamente a GitHub.');
-            } else {
-                alert(`Error al subir el archivo: ${data.message}`);
+                const data = await response.json();
+                if (response.ok) {
+                    alert('Archivo PDF subido exitosamente a GitHub.');
+                    showGitHubFiles(); // Llamamos a la función después de cargar el archivo
+                } else {
+                    alert(`Error al subir el archivo: ${data.message}`);
+                }
+            } catch (error) {
+                console.error('Error en uploadToGitHub:', error);
             }
-
-            showGitHubFiles();
         }
 
         document.getElementById('drop-area').addEventListener('dragover', function(e) {
