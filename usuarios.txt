@@ -1,14 +1,2 @@
-Nombre de usuario: Pepe
-ContraseÃÄÃ¢â¬Å¾a: 123
-
-
-Nombre de usuario: Carlos
-ContraseÄ¹âa: 123
-
-
-Nombre de usuario: Maria
-ContraseÅa: 123
-
 Nombre de usuario: Ian
 Contraseña: 123
-
