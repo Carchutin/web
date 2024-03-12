@@ -89,37 +89,35 @@
             const userData = decodedContent.split('\n')
                 .map(line => line.split(':').map(item => item.trim()));
 
-            return userData.map(([key, value]) => ({ username: key, password: value }));
+            return userData.map(([key, value]) => ({ [key]: value }));
         }
 
         async function login() {
-    const enteredUsername = document.getElementById('username').value;
-    const enteredPassword = document.getElementById('password').value;
+            const enteredUsername = document.getElementById('username').value;
+            const enteredPassword = document.getElementById('password').value;
 
-    try {
-        const users = await fetchUserData();
-        console.log('Usuarios del archivo:', users);
+            try {
+                const userData = await fetchUserData();
 
-        // Verificar si las credenciales coinciden con algún usuario
-        const user = users.find(u => u.username === enteredUsername && u.password === enteredPassword);
-        console.log('Usuario encontrado:', user);
+                // Verificar si el usuario existe y las credenciales son correctas
+                const user = userData.find(user => user['Nombre de usuario'] === enteredUsername && user['Contraseña'] === enteredPassword);
 
-        if (user) {
-            // Redirigir a la página de archivos si las credenciales son correctas
-            window.location.href = 'archivos.html';
-        } else {
-            // Mostrar un mensaje de error si las credenciales son incorrectas
-            alert('Nombre de usuario o contraseña incorrectos');
+                if (user) {
+                    // Redirigir a la página de archivos si las credenciales son correctas
+                    window.location.href = 'archivos.html';
+                } else {
+                    // Mostrar un mensaje de error si las credenciales son incorrectas
+                    alert('Nombre de usuario o contraseña incorrectos');
+                }
+            } catch (error) {
+                // Manejar errores al obtener datos del usuario
+                console.error(error.message);
+                alert('Error al obtener los datos del usuario');
+            }
+
+            // Devolvemos false para evitar que el formulario se envíe realmente.
+            return false;
         }
-    } catch (error) {
-        // Manejar errores al obtener datos del usuario
-        console.error(error.message);
-        alert('Error al obtener los datos del usuario');
-    }
-
-    // Devolvemos false para evitar que el formulario se envíe realmente.
-    return false;
-}
     </script>
 
 </body>
