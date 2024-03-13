@@ -10,3 +10,5 @@ Nombre de usuario: Manuel
 Contrasena: 123
 Nombre de usuario: prueba
 Contrasena: prueba
+Nombre de usuario: Antonia
+Contrasena: pppppppP
