@@ -12,3 +12,5 @@ Nombre de usuario: prueba
 Contrasena: prueba
 Nombre de usuario: Antonia
 Contrasena: pppppppP
+Nombre de usuario: MariaC
+Contrasena: 12345678A
