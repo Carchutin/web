@@ -14,3 +14,5 @@ Nombre de usuario: Antonia
 Contrasena: pppppppP
 Nombre de usuario: MariaC
 Contrasena: 12345678A
+Nombre de usuario: Pepe2
+Contrasena: 12345678A
