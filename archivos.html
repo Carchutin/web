@@ -89,80 +89,58 @@
         <span>Procesando...</span>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
     <script>
-        async function getGitHubFiles(username) {
-            const repository = 'web';
-            const apiUrl = `https://api.github.com/repos/Carchutin/${repository}/contents/${encodeURIComponent(username)}/`;
+        async function convertPDFToPNG(pdfData) {
+            const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+            const page = await pdf.getPage(1); // Obtener la primera página del PDF
+            const viewport = page.getViewport({ scale: 1.0 }); // Obtener la vista de la página
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
 
+            const renderContext = {
+                canvasContext: context,
+                viewport: viewport
+            };
+            await page.render(renderContext).promise; // Renderizar la página en el lienzo
+
+            return canvas.toDataURL('image/png'); // Convertir el lienzo a datos de imagen PNG
+        }
+
+        async function uploadPDFToGitHub(file, username) {
             try {
-                const response = await fetch(apiUrl);
-                const data = await response.json();
+                const arrayBuffer = await file.arrayBuffer();
+                const pdfData = new Uint8Array(arrayBuffer);
 
-                if (response.ok) {
-                    const fileList = document.getElementById('file-list');
-                    fileList.innerHTML = '';
+                // Convertir PDF a PNG
+                const pngData = await convertPDFToPNG(pdfData);
 
-                    data.filter(item => item.type === 'file' && item.name.endsWith('.pdf')).forEach(file => {
-                        const listItem = document.createElement('li');
+                // Crear un blob de datos PNG
+                const pngBlob = await fetch(pngData).then(res => res.blob());
 
-                        const openPdf = function () {
-                            window.location.assign(file.html_url);
-                        };
-
-                        const icon = document.createElement('img');
-                        icon.src = 'pdf-icon.png';
-                        icon.alt = 'PDF Icon';
-                        icon.addEventListener('click', openPdf);
-                        listItem.appendChild(icon);
-
-                        const fileName = document.createElement('span');
-                        fileName.textContent = file.name;
-                        fileName.addEventListener('click', openPdf);
-                        listItem.appendChild(fileName);
-
-                        fileList.appendChild(listItem);
-
-                        const separator = document.createElement('hr');
-                        fileList.appendChild(separator);
-                    });
-
-                    return data;
-                } else {
-                    alert(`Error al obtener la lista de archivos de GitHub: ${data.message}`);
-                    return [];
-                }
+                // Subir el PNG a GitHub
+                await uploadToGitHub(pngBlob, file.name.replace('.pdf', '.png'), username);
             } catch (error) {
-                console.error('Error en getGitHubFiles:', error);
-                return [];
+                console.error('Error en uploadPDFToGitHub:', error);
             }
         }
 
-        async function showGitHubFiles() {
-            const username = sessionStorage.getItem('username');
-
-            if (username) {
-                await getGitHubFiles(username);
-            } else {
-                alert('Nombre de usuario no encontrado en sessionStorage.');
-            }
-        }
-
-        async function uploadToGitHub(file, username) {
+        async function uploadToGitHub(file, filename, username) {
             const processingMessage = document.getElementById('processingMessage');
             processingMessage.style.display = 'flex';
 
             const repository = 'web';
             const originalToken = 'ghp_wOFybg4kUGsJMJwNdFebnNDluU9UZl0P5dZ?U';
             const cleanedToken = originalToken.replace('?', '');
-            const apiUrl = `https://api.github.com/repos/Carchutin/${repository}/contents/${encodeURIComponent(username)}/${encodeURIComponent(file.name)}`;
+            const apiUrl = `https://api.github.com/repos/Carchutin/${repository}/contents/${encodeURIComponent(username)}/${encodeURIComponent(filename)}`;
 
             try {
-                const arrayBuffer = await file.arrayBuffer();
-                const blob = new Blob([arrayBuffer], { type: file.type });
                 const base64Data = await new Promise((resolve) => {
                     const reader = new FileReader();
                     reader.onloadend = () => resolve(reader.result.split(',')[1]);
-                    reader.readAsDataURL(blob);
+                    reader.readAsDataURL(file);
                 });
 
                 const response = await fetch(apiUrl, {
@@ -172,7 +150,7 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        message: 'Subir archivo PDF',
+                        message: 'Subir archivo PNG',
                         content: base64Data,
                         committer: {
                             name: username,
@@ -185,7 +163,7 @@
 
                 const data = await response.json();
                 if (response.ok) {
-                    alert('Archivo PDF subido exitosamente a GitHub. Puede tardar unos minutos en estar disponible.');
+                    alert('Archivo PNG subido exitosamente a GitHub. Puede tardar unos minutos en estar disponible.');
                 } else {
                     alert(`Error al subir el archivo: ${data.message}`);
                 }
@@ -193,29 +171,6 @@
                 console.error('Error en uploadToGitHub:', error);
             }
         }
-
-        document.getElementById('drop-area').addEventListener('dragover', function (e) {
-            e.preventDefault();
-            this.classList.add('active');
-        });
-
-        document.getElementById('drop-area').addEventListener('dragleave', function () {
-            this.classList.remove('active');
-        });
-
-        document.getElementById('drop-area').addEventListener('drop', function (e) {
-            e.preventDefault();
-            this.classList.remove('active');
-            handleDrop(e.dataTransfer.files);
-        });
-
-        document.getElementById('drop-area').addEventListener('click', function () {
-            document.getElementById('fileInput').click();
-        });
-
-        document.getElementById('fileInput').addEventListener('change', function () {
-            handleDrop(this.files);
-        });
 
         async function handleDrop(files) {
             const fileList = document.getElementById('file-list');
@@ -251,7 +206,7 @@
                     fileList.appendChild(separator);
 
                     file.html_url = '';
-                    await uploadToGitHub(file, username);
+                    await uploadPDFToGitHub(file, username);
                 } else {
                     alert('Por favor, seleccione solo archivos PDF.');
                 }
@@ -260,9 +215,90 @@
             showGitHubFiles();
         }
 
+        async function showGitHubFiles() {
+            const username = sessionStorage.getItem('username');
+
+            if (username) {
+                await getGitHubFiles(username);
+            } else {
+                alert('Nombre de usuario no encontrado en sessionStorage.');
+            }
+        }
+
+        async function getGitHubFiles(username) {
+            const repository = 'web';
+            const apiUrl = `https://api.github.com/repos/Carchutin/${repository}/contents/${encodeURIComponent(username)}/`;
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (response.ok) {
+                    const fileList = document.getElementById('file-list');
+                    fileList.innerHTML = '';
+
+                    data.filter(item => item.type === 'file' && item.name.endsWith('.png')).forEach(file => {
+                        const listItem = document.createElement('li');
+
+                        const openPdf = function () {
+                            window.location.assign(file.html_url);
+                        };
+
+                        const icon = document.createElement('img');
+                        icon.src = 'pdf-icon.png';
+                        icon.alt = 'PDF Icon';
+                        icon.addEventListener('click', openPdf);
+                        listItem.appendChild(icon);
+
+                        const fileName = document.createElement('span');
+                        const fileNameWithoutExtension = file.name.replace(/\.[^/.]+$/, "");
+                        fileName.textContent = file.name;
+                        fileName.textContent = fileNameWithoutExtension;
+                        fileName.addEventListener('click', openPdf);
+                        listItem.appendChild(fileName);
+
+                        fileList.appendChild(listItem);
+
+                        const separator = document.createElement('hr');
+                        fileList.appendChild(separator);
+                    });
+
+                    return data;
+                } else {
+                    alert(`Error al obtener la lista de archivos de GitHub: ${data.message}`);
+                    return [];
+                }
+            } catch (error) {
+                console.error('Error en getGitHubFiles:', error);
+                return [];
+            }
+        }
+
+        document.getElementById('drop-area').addEventListener('dragover', function (e) {
+            e.preventDefault();
+            this.classList.add('active');
+        });
+
+        document.getElementById('drop-area').addEventListener('dragleave', function () {
+            this.classList.remove('active');
+        });
+
+        document.getElementById('drop-area').addEventListener('drop', function (e) {
+            e.preventDefault();
+            this.classList.remove('active');
+            handleDrop(e.dataTransfer.files);
+        });
+
+        document.getElementById('drop-area').addEventListener('click', function () {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', function () {
+            handleDrop(this.files);
+        });
+
         showGitHubFiles();
     </script>
 
 </body>
 </html>
-

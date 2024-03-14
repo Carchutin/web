@@ -5,46 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Made In Verse - Registro</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .register-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #4caf50;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -56,9 +17,14 @@
             <input type="text" id="newUsername" name="newUsername" required>
 
             <label for="newPassword">Nueva Contraseña:</label>
-            <input type="password" id="newPassword" name="newPassword" required>
+            <div style="position: relative;">
+                <input type="password" id="newPassword" name="newPassword" required>
+                <button type="button" id="togglePassword" class="toggle-password-btn" onclick="togglePasswordVisibility()">
+                    <img src="Hidden.png" alt="Mostrar contraseña" class="eye-icon" id="eyeIcon">
+                </button>
+            </div>
 
-            <button type="button" onclick="registerUser()">Registrarse</button>
+            <button type="button" class="register-btn" onclick="registerUser()">Registrarse</button>
         </form>
     </div>
 
@@ -125,6 +91,19 @@
                 return;
             }
 
+            // Verificar que la contraseña contenga al menos 8 caracteres
+            if (newPassword.length < 8) {
+                alert('La contraseña debe tener al menos 8 caracteres.');
+                return;
+            }
+
+            // Verificar que la contraseña contenga al menos una letra mayúscula
+            const uppercaseRegex = /[A-Z]/;
+            if (!uppercaseRegex.test(newPassword)) {
+                alert('La contraseña debe contener al menos una letra mayúscula.');
+                return;
+            }
+
             const apiUrl = 'https://api.github.com/repos/Carchutin/web/contents/usuarios.txt';
 
             // Obtener información actual del archivo
@@ -172,8 +151,22 @@
             // Redirigir a la página de inicio de sesión o a otra página.
             window.location.href = 'index.html'; // Cambiar según tus necesidades.
         }
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('newPassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.src = 'Nohidden.png';
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.src = 'Hidden.png';
+            }
+        }
     </script>
 
 </body>
 
 </html>
+

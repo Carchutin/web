@@ -1,0 +1,67 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-container, .register-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 600px; /* Ancho del contenedor del formulario aumentado */
+    max-width: 100%; /* Ancho máximo para dispositivos pequeños */
+}
+
+input {
+    width: calc(100% - 32px);
+    padding: 10px;
+    margin: 8px 0;
+    box-sizing: border-box;
+}
+
+.toggle-password-container {
+    position: relative;
+    width: 100%;
+}
+
+.toggle-password-btn {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.eye-icon {
+    width: 24px;
+    height: auto;
+}
+
+.login-btn, .register-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 16px;
+}
+
+.login-btn:hover, .register-btn:hover {
+    background-color: #45a049;
+}
+
+.login-btn:active, .register-btn:active {
+    background-color: #4caf50;
+}
